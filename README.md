@@ -6,13 +6,17 @@ Subset Xarray datasets in space while retaining the original grid for complex gr
 
 ### `pip compatible`
 
-This package is not yet released on pypi, for now install using git:
+This package is available on pypi:
 
 ```
-pip install xarray_subset_grid@git+https://github.com/asascience-open/xarray-subset-grid.git
+python -m pip install xarray-subset-grid
 ```
 
-Or clone the project from git and build / install it from there.
+And also on conda-forge:
+
+```
+conda install -c conda-forge xarray-subset-grid
+```
 
 ## Usage
 
