@@ -20900,8 +20900,8 @@ packages:
   timestamp: 1763464377176
 - pypi: ./
   name: xarray-subset-grid
-  version: 0.1.1.dev12+gca026b557.d20251203
-  sha256: 370408b113ecd08a1fee4bcd5687657ea30ac24e3b05360122f4b0136abf30b2
+  version: 0.1.1.dev14+geeaa1a0fe
+  sha256: 1552e27c6ae53428ef8a09909f75fa29c849c15b7b3d3c584885395a481e56a6
   requires_dist:
   - cf-xarray
   - cftime
