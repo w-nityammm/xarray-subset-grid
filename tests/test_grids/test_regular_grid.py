@@ -4,127 +4,274 @@ Tests for rectangular grid code.
 
 from pathlib import Path
 
-try:
-    import fsspec
-except ImportError:
-    fsspec = None
+import numpy as np
+import pytest
+
+# only needed if you want to hit AWS servers.
+# try:
+#     import fsspec
+# except ImportError:
+#     fsspec = None
 import xarray as xr
 
+from tests.conftest import RGRID_FILES, SGRID_FILES, UGRID_FILES
 from xarray_subset_grid.grids.regular_grid import RegularGrid
 
-TEST_DATA = Path(__file__).parent.parent / "example_data"
+EXAMPLE_DATA = Path(__file__).parent.parent / "example_data"
 
-TEST_FILE1 = TEST_DATA / "AMSEAS-subset.nc"
 
 # NGOFS2_RGRID.nc is a small subset of the regridded NGOFS2 model.
 
 # It was created by the "OFS subsetter"
 
-
-def test_recognise():
+@pytest.mark.parametrize("test_file", RGRID_FILES)
+def test_recognize(test_file):
     """
     works for at least one file ...
     """
-    ds = xr.open_dataset(TEST_FILE1)
+    ds = xr.open_dataset(test_file)
 
     assert RegularGrid.recognize(ds)
 
 
-def test_recognise_not():
+@pytest.mark.parametrize("test_file", UGRID_FILES + SGRID_FILES)
+def test_recognize_not(test_file):
     """
-    should not recognise an SGrid
+    should not recognize an SGrid
     """
-    ds = xr.open_dataset(TEST_DATA / "arakawa_c_test_grid.nc")
+    ds = xr.open_dataset(test_file)
 
     assert not RegularGrid.recognize(ds)
 
 
-#######
-# These from the ugrid tests -- need to be adapted
-#######
+def create_synthetic_rectangular_grid_dataset(decreasing=False):
+    """
+    Create a synthetic dataset with regular grid.
 
-# def test_grid_vars():
-#     """
-#     Check if the grid vars are defined properly
-#     """
-#     ds = xr.open_dataset(EXAMPLE_DATA / "SFBOFS_subset1.nc")
+    Can be either decreasing or increasing in latitude
+    """
 
-#     ds = ugrid.assign_ugrid_topology(ds, **grid_topology)
+    lon = np.linspace(-100, -80, 21)
+    if decreasing:
+        lat = np.linspace(50, 30, 21)
+    else:
+        lat = np.linspace(30, 50, 21)
 
-#     grid_vars = ds.xsg.grid_vars
+    data = np.random.rand(21, 21)
 
-#     # ['mesh', 'nv', 'lon', 'lat', 'lonc', 'latc']
-#     assert grid_vars == set(["mesh", "nv", "nbe", "lon", "lat", "lonc", "latc"])
+    ds = xr.Dataset(
+        data_vars={
+            "temp": (("lat", "lon"), data),
+            "salt": (("lat", "lon"), data),
+        },
+        coords={
+            "lat": lat,
+            "lon": lon,
+        },
+    )
+    # Add cf attributes
+    ds.lat.attrs = {"standard_name": "latitude", "units": "degrees_north"}
+    ds.lon.attrs = {"standard_name": "longitude", "units": "degrees_east"}
+    ds.temp.attrs = {"standard_name": "sea_water_temperature"}
 
-
-# def test_data_vars():
-#     """
-#     Check if the grid vars are defined properly
-
-#     This is not currently working correctly!
-#     """
-#     ds = xr.open_dataset(EXAMPLE_DATA / "SFBOFS_subset1.nc")
-#     ds = ugrid.assign_ugrid_topology(ds, **grid_topology)
-
-#     data_vars = ds.xsg.data_vars
-
-#     assert set(data_vars) == set(
-#         [
-#             "h",
-#             "zeta",
-#             "temp",
-#             "salinity",
-#             "u",
-#             "v",
-#             "uwind_speed",
-#             "vwind_speed",
-#             "wet_nodes",
-#             "wet_cells",
-#         ]
-#     )
+    return ds
 
 
-# def test_extra_vars():
-#     """
-#     Check if the extra vars are defined properly
-
-#     This is not currently working correctly!
-#     """
-#     ds = xr.open_dataset(EXAMPLE_DATA / "SFBOFS_subset1.nc")
-#     ds = ugrid.assign_ugrid_topology(ds, **grid_topology)
-
-#     extra_vars = ds.xsg.extra_vars
-
-#     print([*ds])
-#     print(f"{extra_vars=}")
-#     assert extra_vars == set(
-#         [
-#             "nf_type",
-#             "Times",
-#         ]
-#     )
 
 
-# def test_coords():
-#     ds = xr.open_dataset(EXAMPLE_DATA / "SFBOFS_subset1.nc")
-#     ds = ugrid.assign_ugrid_topology(ds, **grid_topology)
+def test_grid_vars():
+    """
+    Check if the grid vars are defined properly
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "AMSEAS-subset.nc")
 
-#     coords = ds.xsg.coords
+    grid_vars = ds.xsg.grid_vars
 
-#     print(f"{coords=}")
-#     print(f"{ds.coords=}")
+    # ['mesh', 'nv', 'lon', 'lat', 'lonc', 'latc']
+    assert grid_vars == {'lat', 'lon'}
 
-#     assert set(coords) == set(
-#         [
-#             "lon",
-#             "lat",
-#             "lonc",
-#             "latc",
-#             "time",
-#             "siglay",
-#             "siglev",
-#         ]
-#     )
+
+def test_data_vars():
+    """
+    Check if the data vars are defined properly
+
+    This is not currently working correctly!
+
+    it finds extra stuff
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "AMSEAS-subset.nc")
+
+    data_vars = ds.xsg.data_vars
+
+    # the extra "time" variables are not using the grid
+    # so they should not be listed as data_vars
+    assert data_vars == {
+        'water_w',
+        'salinity',
+        'surf_roughness',
+        'surf_temp_flux',
+        'water_v',
+        # 'time_offset',
+        'water_temp',
+        'water_baro_v',
+        'surf_atm_press',
+        'surf_el',
+        'surf_salt_flux',
+        'water_u',
+        'surf_wnd_stress_gridy',
+        'water_baro_u',
+        'watdep',
+        'surf_solar_flux',
+        # 'time1_run',
+        'surf_wnd_stress_gridx',
+        # 'time1_offset'
+    }
+
+# might not be needed if tested elsewhere.
+def test_data_vars2():
+    """
+    redundant with above, by already written ...
+    """
+    print("Testing data_vars error...")
+    ds = create_synthetic_rectangular_grid_dataset()
+    # Ensure it is recognized as a RegularGrid
+    assert RegularGrid.recognize(ds)
+
+    # Access xsg accessor
+    data_vars = ds.xsg.data_vars
+    print(f"data_vars: {data_vars}")
+
+    assert data_vars == {'salt', 'temp'}
+
+
+def test_extra_vars():
+    """
+    Check if the extra vars are defined properly
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "AMSEAS-subset.nc")
+
+    extra_vars = ds.xsg.extra_vars
+
+    # the extra "time" variables are not using the grid
+    # so they should be listed as extra_vars
+    assert extra_vars == {
+        'time_offset',
+        'time1_run',
+        'time1_offset'
+    }
+
+def test_subset_to_bb():
+    """
+    Not a complete test by any means, but the basics are there.
+
+    NOTE: it doesn't test if the variables got subset corectly ...
+
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "2D-rectangular_grid_wind.nc")
+
+    print("initial bounds:", ds['lon'].data.min(),
+                             ds['lat'].data.min(),
+                             ds['lon'].data.max(),
+                             ds['lat'].data.max(),
+                            )
+
+    bbox = (-0.5, 0, 0.5, 0.5)
+
+    ds2 = ds.xsg.subset_bbox(bbox)
+
+    assert ds2['lat'].size == 15
+    assert ds2['lon'].size == 29
+
+    new_bounds = (ds2['lon'].data.min(),
+                  ds2['lat'].data.min(),
+                  ds2['lon'].data.max(),
+                  ds2['lat'].data.max(),
+                  )
+    print("new bounds:", new_bounds)
+    assert new_bounds == bbox
+
+def test_decreasing_latitude():
+    """
+    Some datasets have the latitude or longitude decreasing: 10, 9, 8 etc.
+    e.g the NOAA GFS met model
+
+    subsetting should still work
+
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "rectangular_grid_decreasing.nc")
+
+    print("initial bounds:", ds['lon'].data.min(),
+                             ds['lat'].data.min(),
+                             ds['lon'].data.max(),
+                             ds['lat'].data.max(),
+                            )
+
+    bbox = (-0.5, 0, 0.5, 0.5)
+
+    ds2 = ds.xsg.subset_bbox(bbox)
+
+    assert ds2['lat'].size == 15
+    assert ds2['lon'].size == 29
+
+    new_bounds = (ds2['lon'].data.min(),
+                  ds2['lat'].data.min(),
+                  ds2['lon'].data.max(),
+                  ds2['lat'].data.max(),
+                  )
+    print("new bounds:", new_bounds)
+    assert new_bounds == bbox
+
+def test_decreasing_coords():
+    """
+    Redundant with above, but already written ...
+    """
+    print("\nTesting decreasing coordinates support...")
+    ds = create_synthetic_rectangular_grid_dataset(decreasing=True)
+    # assert RegularGrid.recognize(ds)
+
+    # bbox: (min_lon, min_lat, max_lon, max_lat)
+    bbox = (-95, 35, -85, 45)
+
+    subset = ds.xsg.subset_bbox(bbox)
+    print(f"Subset size: {subset.sizes}")
+
+    # Check if subset has data
+    assert subset.sizes["lat"] > 0
+    assert subset.sizes["lon"] > 0
+
+def test_subset_polygon():
+    """
+    Not a complete test by any means, but the basics are there.
+
+    NOTE: it doesn't test if the variables got subset corectly ...
+
+    """
+    ds = xr.open_dataset(EXAMPLE_DATA / "2D-rectangular_grid_wind.nc")
+
+    print("initial bounds:", ds['lon'].data.min(),
+                             ds['lat'].data.min(),
+                             ds['lon'].data.max(),
+                             ds['lat'].data.max(),
+                            )
+
+    poly = [(-0.5, 0.0), (0.0, 0.5), (0.5, 0.5), (0.5, 0.0), (0, 0.0)]
+    # this poly has this bounding box:
+    # bbox = (-0.5, 0, 0.5, 0.5)
+    # so results should be the same as the bbox tests
+
+    ds2 = ds.xsg.subset_polygon(poly)
+
+    assert ds2['lat'].size == 15
+    assert ds2['lon'].size == 29
+
+    new_bounds = (ds2['lon'].data.min(),
+                  ds2['lat'].data.min(),
+                  ds2['lon'].data.max(),
+                  ds2['lat'].data.max(),
+                  )
+    print("new bounds:", new_bounds)
+    assert new_bounds == (-0.5, 0, 0.5, 0.5)
+
 
 
 # def test_vertical_levels():

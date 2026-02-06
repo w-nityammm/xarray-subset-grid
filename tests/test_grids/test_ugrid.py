@@ -12,12 +12,47 @@ import numpy as np
 import pytest
 import xarray as xr
 
+from tests.conftest import RGRID_FILES, SGRID_FILES, UGRID_FILES
 from xarray_subset_grid import Selector
 from xarray_subset_grid.grids import ugrid
+from xarray_subset_grid.grids.ugrid import UGrid
 
-EXAMPLE_DATA = Path(__file__).parent.parent.parent / "docs" / "examples" / "example_data"
+EXAMPLE_DATA = Path(__file__).parent.parent / "example_data"
 
-TEST_FILE1 = EXAMPLE_DATA / "SFBOFS_subset1.nc"
+@pytest.mark.parametrize("test_file", UGRID_FILES[:3])
+def test_recognize(test_file):
+    """
+    works for at least one file ...
+    """
+    print("testing: ", test_file)
+    ds = xr.open_dataset(test_file)
+    try:
+        ds.cf.cf_roles["mesh_topology"][0]
+    except KeyError:  # no mesh variable
+        # Hacky way to deal with non-conforming examples
+        # This should be in a config somewhere, or ??
+        if 'tris' in ds:
+            grid_top = {'face_node_connectivity': 'tris',
+             'node_coordinates': ('lon', 'lat')
+             }
+        elif 'nv' in ds:
+            grid_top = {'face_node_connectivity': 'nv',
+             'node_coordinates': ('lon', 'lat')
+             }
+        ds = ugrid.assign_ugrid_topology(ds, **grid_top)
+
+    assert UGrid.recognize(ds)
+
+
+@pytest.mark.parametrize("test_file", RGRID_FILES + SGRID_FILES)
+def test_recognize_not(test_file):
+    """
+    should not recognize an SGrid
+    """
+    ds = xr.open_dataset(test_file)
+
+    assert not UGrid.recognize(ds)
+
 
 # SFBOFS_subset1.nc is a smallish subset of the SFBOFS FVCOM model
 
@@ -218,7 +253,7 @@ TEST_FILE1 = EXAMPLE_DATA / "SFBOFS_subset1.nc"
 #         cell:standard_name = "cell number" ;
 #         cell:long_name = "Mapping to original mesh cell number" ;
 
-# topology for TEST_FILE1
+# topology for SFBOFS_subset1
 grid_topology = {
     "node_coordinates": "lon lat",
     "face_node_connectivity": "nv",

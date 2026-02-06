@@ -1,8 +1,11 @@
 import warnings
+from datetime import datetime
 
 import cf_xarray  # noqa
+import cftime
 import numpy as np
 import xarray as xr
+from dateutil.parser import parse as parsetime
 
 
 def normalize_polygon_x_coords(x, poly):
@@ -151,3 +154,22 @@ def compute_2d_subset_mask(
     polygon_mask = np.where(polygon_mask > 1, True, False)
 
     return xr.DataArray(polygon_mask, dims=mask_dims)
+
+def asdatetime(dt):
+    """
+    makes sure the input is a datetime.datetime object
+
+    if it already is, it will be passed through.
+
+    If not it will attempt to parse a string to make a datetime object.
+
+    None will also be passed through silently
+    """
+    if dt is None:
+        return dt
+    # if not isinstance(dt, datetime):
+    if not isinstance(dt, datetime | cftime.datetime):
+        # assume it's an iso string, or something that dateutils can parse.
+        return parsetime(dt, ignoretz=True)
+    else:
+        return dt
