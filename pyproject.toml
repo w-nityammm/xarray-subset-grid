@@ -127,6 +127,7 @@ zarr = "<3"
 netcdf4 = "*"
 h5netcdf = "*"
 
+
 [tool.pixi.feature.dev.dependencies]
 ruff = "*"
 pre-commit = "*"
@@ -138,6 +139,8 @@ sphinx-rtd-theme = "*"
 pip = "*"
 setuptools_scm = "*"
 python-build = "*"
+sphinx-autodoc-typehints = "*"
+myst-nb = "*"
 
 [tool.pixi.feature.dev.tasks]
 lint = "ruff check tests xarray_subset_grid"
