@@ -107,6 +107,7 @@ test311 = [ "dev", "py311" ]
 test312 = [ "dev", "py312" ]
 test313 = [ "dev", "py313" ]
 test314 = [ "dev", "py314" ]
+testcov = [ "dev", "py314" ]
 
 [tool.pixi.system-requirements]
 macos = "11.0"
@@ -145,6 +146,7 @@ myst-nb = "*"
 lint = "ruff check tests xarray_subset_grid"
 test = "pytest tests/"
 test_all = "pytest --online tests/"
+test_cov = "pytest --cov=xarray_subset_grid tests"
 
 [tool.pixi.feature.examples.dependencies]
 matplotlib = "*"
