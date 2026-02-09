@@ -33,11 +33,6 @@ repos:
       args: ["--fix", "--show-fixes"]
     - id: ruff-format
 
-- repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.14.2
-  hooks:
-    - id: pyproject-fmt
-
 - repo: https://github.com/woodruffw/zizmor-pre-commit
   rev: v1.22.0
   hooks:
