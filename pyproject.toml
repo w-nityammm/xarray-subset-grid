@@ -36,7 +36,6 @@ dependencies = [
   "cf-xarray",
   "cftime",
   "dask",
-  # "dask[complete]", # getting errors from pixi with the "complete"
   "netcdf4",
   "numpy",
   "xarray>=2024.6",
