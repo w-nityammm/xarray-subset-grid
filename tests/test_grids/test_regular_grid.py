@@ -161,7 +161,7 @@ def test_subset_to_bb():
     """
     Not a complete test by any means, but the basics are there.
 
-    NOTE: it doesn't test if the variables got subset corectly ...
+    NOTE: it doesn't test if the variables got subset correctly ...
 
     """
     ds = xr.open_dataset(EXAMPLE_DATA / "2D-rectangular_grid_wind.nc")
@@ -249,7 +249,7 @@ def test_subset_polygon():
     """
     Not a complete test by any means, but the basics are there.
 
-    NOTE: it doesn't test if the variables got subset corectly ...
+    NOTE: it doesn't test if the variables got subset correctly ...
 
     """
     ds = xr.open_dataset(EXAMPLE_DATA / "2D-rectangular_grid_wind.nc")

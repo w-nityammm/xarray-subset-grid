@@ -21,7 +21,7 @@ from xarray_subset_grid.utils import (
 
 # class RegularGridPolygonSelector(Selector):
 #     """Polygon Selector for regular lat/lon grids."""
-#     # with a regular grid, you have to select the full boudning box anyway
+#     # with a regular grid, you have to select the full bounding box anyway
 #     # this this simply computes the bounding box, and used that
 
 #     polygon: list[tuple[float, float]] | np.ndarray
@@ -63,13 +63,13 @@ class RegularGridBBoxSelector(Selector):
         lat = ds[ds.cf.coordinates.get("latitude")[0]]
         lon = ds[ds.cf.coordinates.get("longitude")[0]]
         if np.all(np.diff(lat) < 0):
-            # swap the slice if the latitudes are decending
+            # swap the slice if the latitudes are descending
             self._latitude_selection = slice(
                 self._latitude_selection.stop, self._latitude_selection.start
             )
         # and np.all(np.diff(lon) > 0):
         if np.all(np.diff(lon) < 0):
-            # swap the slice if the longitudes are decending
+            # swap the slice if the longitudes are descending
             self._longitude_selection = slice(
                 self._longitude_selection.stop, self._longitude_selection.start
             )
