@@ -1,6 +1,5 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-
 requires = [ "setuptools>=72", "setuptools-scm[toml]>=8", "wheel" ]
 
 [project]
@@ -9,7 +8,6 @@ description = "Subset Xarray datasets in time and space"
 readme = "README.md"
 keywords = [ "xarray" ]
 license = { file = "LICENSE" }
-
 authors = [
   { name = "Christopher H. Barker", email = "chris.barker@noaa.gov" },
   { name = "Matthew Iannucci", email = "matt.iannucci@tetratech.com" },
@@ -29,9 +27,7 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Topic :: Scientific/Engineering",
 ]
-
 dynamic = [ "version" ]
-
 dependencies = [
   "cf-xarray",
   "cftime",
@@ -41,7 +37,6 @@ dependencies = [
   "numpy",
   "xarray>=2024.6",
 ]
-
 optional-dependencies.dev = [
   "pre-commit",
   "pytest",
@@ -63,7 +58,6 @@ write_to = "xarray_subset_grid/_version.py"
 target-version = "py310"
 # Use a longer line length.
 line-length = 100
-
 builtins = [ "ellipsis" ]
 extend-exclude = [ "docs", "xarray_subset_grid/_version.py" ]
 # Prefer single quotes over double quotes.
@@ -91,78 +85,56 @@ lint.extend-safe-fixes = [
 venvPath = "."
 venv = "venv"
 
-[tool.pixi.dependencies]
-python = ">=3.10"
-numpy = "*"
-xarray = ">=2024.6"
-pandas = "*"
-cf_xarray = "*"
-dask = "*"
-fsspec = "*"
-s3fs = "*"
-zarr = "<3"
-netcdf4 = "*"
-h5netcdf = "*"
-
-[tool.pixi.environments]
-default = { solve-group = "default" }
-dev = { features = [ "dev" ], solve-group = "default" }
-examples = { features = [ "examples" ], solve-group = "default" }
-all = { features = [ "dev", "examples" ], solve-group = "default" }
-test310 = [ "dev", "py310" ]                                        # implicit: test310 = ["dev", "py310", "default"]
-test311 = [ "dev", "py311" ]
-test312 = [ "dev", "py312" ]
-test313 = [ "dev", "py313" ]
-test314 = [ "dev", "py314" ]
-testcov = [ "dev", "py314" ]
-
-[tool.pixi.feature.dev.dependencies]
-ruff = "*"
-pre-commit = "*"
-pyright = "*"
-pytest = "*"
-pytest-cov = "<7"
-sphinx = "*"
-sphinx-rtd-theme = "*"
-pip = "*"
-setuptools_scm = "*"
-python-build = "*"
-sphinx-autodoc-typehints = "*"
-myst-nb = "*"
-
-[tool.pixi.feature.dev.tasks]
-lint = "ruff check tests xarray_subset_grid"
-test = "pytest tests/"
-test_all = "pytest --online tests/"
-test_cov = "pytest --cov=xarray_subset_grid tests"
-
-[tool.pixi.feature.examples.dependencies]
-matplotlib = "*"
-jupyter = "*"
-ipython = "*"
-
-[tool.pixi.feature.py310.dependencies]
-python = "~=3.10"
-
-[tool.pixi.feature.py311.dependencies]
-python = "~=3.11"
-
-[tool.pixi.feature.py312.dependencies]
-python = "~=3.12"
-
-[tool.pixi.feature.py313.dependencies]
-python = "~=3.13"
-
-[tool.pixi.feature.py314.dependencies]
-python = "~=3.14"
-[tool.pixi.pypi-dependencies]
-xarray_subset_grid = { path = ".", editable = true }
-
-[tool.pixi.system-requirements]
-macos = "11.0"
-
-[tool.pixi.tasks]
-
-[tool.pixi.workspace]
-channels = [ "conda-forge" ]
-platforms = [ "linux-64", "osx-arm64", "osx-64", "win-64" ]
+[tool.pixi]
+dependencies.python = ">=3.10"
+dependencies.numpy = "*"
+dependencies.xarray = ">=2024.6"
+dependencies.pandas = "*"
+dependencies.cf_xarray = "*"
+dependencies.dask = "*"
+dependencies.fsspec = "*"
+dependencies.s3fs = "*"
+dependencies.zarr = "<3"
+dependencies.netcdf4 = "*"
+dependencies.h5netcdf = "*"
+environments.default = { solve-group = "default" }
+environments.dev = { features = [ "dev" ], solve-group = "default" }
+environments.examples = { features = [ "examples" ], solve-group = "default" }
+environments.all = { features = [ "dev", "examples" ], solve-group = "default" }
+environments.test310 = [
+  "dev",
+  "py310",
+]  # implicit: test310 = ["dev", "py310", "default"]
+environments.test311 = [ "dev", "py311" ]
+environments.test312 = [ "dev", "py312" ]
+environments.test313 = [ "dev", "py313" ]
+environments.test314 = [ "dev", "py314" ]
+environments.testcov = [ "dev", "py314" ]
+feature.dev.dependencies.ruff = "*"
+feature.dev.dependencies.pre-commit = "*"
+feature.dev.dependencies.pyright = "*"
+feature.dev.dependencies.pytest = "*"
+feature.dev.dependencies.pytest-cov = "<7"
+feature.dev.dependencies.sphinx = "*"
+feature.dev.dependencies.sphinx-rtd-theme = "*"
+feature.dev.dependencies.pip = "*"
+feature.dev.dependencies.setuptools_scm = "*"
+feature.dev.dependencies.python-build = "*"
+feature.dev.dependencies.sphinx-autodoc-typehints = "*"
+feature.dev.dependencies.myst-nb = "*"
+feature.dev.tasks.lint = "ruff check tests xarray_subset_grid"
+feature.dev.tasks.test = "pytest tests/"
+feature.dev.tasks.test_all = "pytest --online tests/"
+feature.dev.tasks.test_cov = "pytest --cov=xarray_subset_grid tests"
+feature.examples.dependencies.matplotlib = "*"
+feature.examples.dependencies.jupyter = "*"
+feature.examples.dependencies.ipython = "*"
+feature.py310.dependencies.python = "~=3.10"
+feature.py311.dependencies.python = "~=3.11"
+feature.py312.dependencies.python = "~=3.12"
+feature.py313.dependencies.python = "~=3.13"
+feature.py314.dependencies.python = "~=3.14"
+pypi-dependencies.xarray_subset_grid = { path = ".", editable = true }
+system-requirements.macos = "11.0"
+workspace.channels = [ "conda-forge" ]
+workspace.platforms = [ "linux-64", "osx-arm64", "osx-64", "win-64" ]
