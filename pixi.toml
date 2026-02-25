@@ -21,40 +21,45 @@ h5netcdf = "*"
 
 [environments]
 default = { solve-group = "default" }
-dev = { features = [ "dev" ], solve-group = "default" }
+test = { features = [ "test" ], solve-group = "default" }
+docs = { features = [ "docs" ], solve-group = "default" }
 examples = { features = [ "examples" ], solve-group = "default" }
-all = { features = [ "dev", "examples" ], solve-group = "default" }
-test310 = [ "dev", "py310" ]  # implicit: test310 = ["dev", "py310", "default"]
-test311 = [ "dev", "py311" ]
-test312 = [ "dev", "py312" ]
-test313 = [ "dev", "py313" ]
-test314 = [ "dev", "py314" ]
-testcov = [ "dev", "py314" ]
+dev = { features = [ "test", "docs", "dev", "examples" ], solve-group = "default" }
+test310 = [ "test", "py310" ]  # implicit: test310 = ["test", "py310", "default"]
+test311 = [ "test", "py311" ]
+test312 = [ "test", "py312" ]
+test313 = [ "test", "py313" ]
+test314 = [ "test", "py314" ]
+testcov = [ "test", "py314" ]
 
 [system-requirements]
 macos = "11.0"
 
 [tasks]
 
-[feature.dev.dependencies]
+[feature.test.dependencies]
 ruff = "*"
-pre-commit = "*"
-pyright = "*"
 pytest = "*"
 pytest-cov = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
-pip = "*"
-setuptools_scm = "*"
-python-build = "*"
-sphinx-autodoc-typehints = "*"
-myst-nb = "*"
 
-[feature.dev.tasks]
+[feature.test.tasks]
 lint = "ruff check tests xarray_subset_grid"
 test = "pytest tests/"
 test_all = "pytest --online tests/"
 test_cov = "pytest --cov=xarray_subset_grid tests"
+
+[feature.docs.dependencies]
+sphinx = "*"
+sphinx-rtd-theme = "*"
+sphinx-autodoc-typehints = "*"
+myst-nb = "*"
+
+[feature.dev.dependencies]
+pre-commit = "*"
+pyright = "*"
+pip = "*"
+setuptools_scm = "*"
+python-build = "*"
 
 [feature.examples.dependencies]
 matplotlib = "*"
